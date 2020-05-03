@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const app = express();
 const port = 3000;
 
-const studentsRawData = [
+let studentsRawData = [
   {
     firstName: 'Abdelmamajid',
     lastName: 'AHAMIANE',
@@ -148,7 +148,33 @@ app.get('/students', (req, res) => {
   setTimeout(() => {
     res.json(studentsRawData);
     // res.sendStatus(500);
-  }, 1000);
+  }, 2000);
+});
+
+app.get('/students/:githubAccountName', (req, res) => {
+  setTimeout(() => {
+    const githubAccountUrl = 'https://github.com/' + req.params.githubAccountName;
+    const existingStudent = _.find(studentsRawData, {githubAccountUrl});
+    if (existingStudent) {
+      res.json(existingStudent);
+    } else {
+      res.sendStatus(404);
+    }
+  }, 500);
+});
+
+app.delete('/students/:githubAccountName', (req, res) => {
+  setTimeout(() => {
+    const githubAccountUrl = 'https://github.com/' + req.params.githubAccountName;
+    const existingStudent = _.find(studentsRawData, {githubAccountUrl});
+
+    if (existingStudent) {
+      studentsRawData = studentsRawData.filter(s => s.githubAccountUrl !== githubAccountUrl)
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(404);
+    }
+  }, 500);
 });
 
 app.post('/students', (req, res) => {
@@ -165,5 +191,7 @@ app.post('/students', (req, res) => {
     res.json(newStudentAttributes);
   }, 2000);
 });
+
+
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));

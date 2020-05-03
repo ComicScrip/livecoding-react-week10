@@ -1,11 +1,13 @@
-import React from 'react';
+import React, {useEffect} from 'react'
 import StudentsTable from './StudentsTable';
 import { withStudents } from '../data/students';
 import LoadingIndicator from './LoadingIndicator';
 import ErrorBox from './ErrorBox';
 import StudentForm from './StudentForm'
 
-function StudentsPage ({ loadingStudents, studentList, fetchStudentsError, createStudent, submittingStudent, submitStudentError }) {
+function StudentsPage ({ loadingStudents, studentList, fetchStudentsError, fetchStudentList, createStudent, submittingStudent, submitStudentError }) {
+  useEffect(fetchStudentList, []);
+
   return (
     <div>
       <h2>Liste des étudiants</h2>

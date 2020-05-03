@@ -9,14 +9,15 @@ class Student {
   }
 
   static async loadAll () {
-    return axios.get('http://localhost:3000/students')
-      .then(res => res.data)
-      .then(students => students.map(s => new Student(s)));
+    return axios.get('http://localhost:3000/students').then(res => res.data)
+  }
+
+  static async loadOne (githubAccountName) {
+    return axios.get(`http://localhost:3000/students/${githubAccountName}`).then(res => res.data)
   }
 
   static async create(attributes) {
-    return axios.post('http://localhost:3000/students', attributes)
-      .then(res => res.data)
+    return axios.post('http://localhost:3000/students', attributes).then(res => res.data)
   }
 
   get githubUserName () {
@@ -36,21 +37,42 @@ class Student {
 export const withStudents = WrappedComponent => {
   return (props) => {
     const [loadingStudents, setLoadingStudents] = useState(false);
+    const [loadingSingleStudent, setLoadingSingleStudent] = useState(false);
     const [submittingStudent, setSubmittingStudent] = useState(false);
     const [studentList, setStudentList] = useState([]);
+    const [singleStudent, setSingleStudent] = useState(null);
     const [fetchStudentsError, setFetchStudentsError] = useState(null);
     const [submitStudentError, setSubmitStudentError] = useState(null);
+    const [fetchSingleStudentError, setFetchSingleStudentError] = useState(null);
+
     const fetchStudentList = () => {
       setLoadingStudents(true);
       setFetchStudentsError(null);
       Student.loadAll()
         .then(studentList => {
-          setStudentList(studentList);
+          setStudentList(studentList.map(s => new Student(s)));
           setFetchStudentsError(null);
         }).catch(error => {
           console.error(error);
           setFetchStudentsError('Une erreur est survenue lors du chargement de la liste des élèves');
         }).finally(() => setLoadingStudents(false));
+    };
+
+    const fetchSingleStudent = (githubAccountName) => {
+      setLoadingSingleStudent(true);
+      setFetchSingleStudentError(null);
+      Student.loadOne(githubAccountName)
+        .then(student => {
+          setSingleStudent(new Student(student));
+          setFetchSingleStudentError(null);
+        }).catch(({response}) => {
+        console.error(response);
+        if (response && response.status === 404) {
+          setFetchSingleStudentError(`Aucun élève avec l'identifiant "${githubAccountName}" n'a été trouvé sur le serveur`);
+        } else {
+          setFetchSingleStudentError('Une erreur est survenue lors du chargement de cet élève');
+        }
+      }).finally(() => setLoadingSingleStudent(false));
     };
 
     const createStudent = (attributes) => {
@@ -64,21 +86,23 @@ export const withStudents = WrappedComponent => {
         if (response.data && response.data.error) {
           setSubmitStudentError("Erreur : " + response.data.error)
         } else {
-          setSubmitStudentError("Un problème est survenu lors de l'enregistrement de l'étudiant")
+          setSubmitStudentError("Un problème est survenu lors de la création de l'étudiant sur le serveur")
         }
       }).finally(() => setSubmittingStudent(false))
     }
 
-    useEffect(fetchStudentList, []);
-
     return (
-      <WrappedComponent {...{
-        ...{
+      <WrappedComponent {...{...{
           loadingStudents,
           studentList,
           fetchStudentsError,
+          loadingSingleStudent,
+          singleStudent,
+          fetchSingleStudentError,
           submittingStudent,
           submitStudentError,
+          fetchStudentList,
+          fetchSingleStudent,
           createStudent
         },
         ...props
