@@ -14,6 +14,11 @@ class Student {
       .then(students => students.map(s => new Student(s)));
   }
 
+  static async create(attributes) {
+    return axios.post('http://localhost:3000/students', attributes)
+      .then(res => res.data)
+  }
+
   get githubUserName () {
     const accountUrlParts = this.githubAccountUrl.split('/');
     return accountUrlParts[accountUrlParts.length - 1];
@@ -31,8 +36,10 @@ class Student {
 export const withStudents = WrappedComponent => {
   return (props) => {
     const [loadingStudents, setLoadingStudents] = useState(false);
+    const [submittingStudent, setSubmittingStudent] = useState(false);
     const [studentList, setStudentList] = useState([]);
     const [fetchStudentsError, setFetchStudentsError] = useState(null);
+    const [submitStudentError, setSubmitStudentError] = useState(null);
     const fetchStudentList = () => {
       setLoadingStudents(true);
       setFetchStudentsError(null);
@@ -46,10 +53,36 @@ export const withStudents = WrappedComponent => {
         }).finally(() => setLoadingStudents(false));
     };
 
+    const createStudent = (attributes) => {
+      setSubmittingStudent(true);
+      setSubmitStudentError(false);
+      return Student.create(attributes).then(student => {
+        setStudentList([...studentList, student].map(s => new Student(s)));
+        setSubmitStudentError(null);
+      }).catch(({response}) => {
+        console.error(response)
+        if (response.data && response.data.error) {
+          setSubmitStudentError("Erreur : " + response.data.error)
+        } else {
+          setSubmitStudentError("Un problème est survenu lors de l'enregistrement de l'étudiant")
+        }
+      }).finally(() => setSubmittingStudent(false))
+    }
+
     useEffect(fetchStudentList, []);
 
     return (
-      <WrappedComponent {...{ ...{ loadingStudents, studentList, fetchStudentsError }, ...props }} />
+      <WrappedComponent {...{
+        ...{
+          loadingStudents,
+          studentList,
+          fetchStudentsError,
+          submittingStudent,
+          submitStudentError,
+          createStudent
+        },
+        ...props
+      }} />
     );
   };
 };

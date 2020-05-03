@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { sortBy } from 'lodash';
 
@@ -27,24 +27,21 @@ const SortButton = ({ fieldToSortBy, sortOrder, activeSort, onClick }) => {
   );
 };
 
-function StudentsTable (props) {
-  const [activeSort, setActiveSort] = useState(null);
-  const [sortedStudents, setSortedStudents] = useState(props.students);
-
-  const handleSortButtonClicked = (fieldToSortByWithOrder) => {
-    if (activeSort === fieldToSortByWithOrder) {
-      setSortedStudents(props.students);
-      setActiveSort(null);
-    } else {
-      const [fieldToSortBy, sortOrder] = fieldToSortByWithOrder.split(' ');
-      let sortedStudents = sortBy(props.students, fieldToSortBy);
-      if (sortOrder === 'DESC') {
-        sortedStudents = sortedStudents.reverse();
-      }
-      setActiveSort(fieldToSortByWithOrder);
-      setSortedStudents(sortedStudents);
-    }
+function StudentsTable ({students}) {
+  const [activeSort, setActiveSort] = useState('');
+  const sortStudents = fieldToSortByWithOrder => {
+    setActiveSort(activeSort === fieldToSortByWithOrder ? '' : fieldToSortByWithOrder);
   };
+  const handleSortButtonClicked = fieldToSortByWithOrder => sortStudents(fieldToSortByWithOrder)
+  const [fieldToSortBy, sortOrder] = activeSort.split(' ');
+
+  let sortedStudents = students;
+  if (fieldToSortBy) {
+    sortedStudents = sortBy(students, fieldToSortBy);
+    if (sortOrder === 'DESC') {
+      sortedStudents = sortedStudents.reverse();
+    }
+  }
 
   return (
     <table>
@@ -72,4 +69,4 @@ function StudentsTable (props) {
   );
 }
 
-export default StudentsTable;
+export default React.memo(StudentsTable, (prev, next) => prev.students === next.students);

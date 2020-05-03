@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const _ = require('lodash');
+const bodyParser = require('body-parser')
 const app = express();
 const port = 3000;
 
@@ -140,13 +142,28 @@ const studentsRawData = [
 ];
 
 app.use(cors());
+app.use(bodyParser.json())
 
 app.get('/students', (req, res) => {
-  res.header('');
   setTimeout(() => {
     res.json(studentsRawData);
     // res.sendStatus(500);
   }, 1000);
+});
+
+app.post('/students', (req, res) => {
+  setTimeout(() => {
+    const newStudentAttributes = req.body;
+    const existingStudent = _.find(studentsRawData, {githubAccountUrl: newStudentAttributes.githubAccountUrl})
+
+    if (existingStudent) {
+      res.status(400);
+      return res.json({error: `Un étudiant avec l\'URL Github "${newStudentAttributes.githubAccountUrl}" existe déjà sur le serveur !`})
+    }
+
+    studentsRawData.push({...newStudentAttributes, p1bisPresented: false, p1bisRepoUrl: newStudentAttributes.githubAccountUrl});
+    res.json(newStudentAttributes);
+  }, 2000);
 });
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));

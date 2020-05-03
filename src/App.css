@@ -194,3 +194,22 @@ td a {
 .col-sort-buttons-container .sort-button.active{
   opacity: 1;
 }
+
+.student-form .field {
+  margin-bottom: 10px;
+}
+
+.student-form .field input {
+  padding: 5px;
+}
+
+.student-form input[type=submit] {
+  background-color: #191919;
+  border: 1px solid #2a2a2a;
+  display: block;
+  padding: 10px;
+  color: white;
+  cursor: pointer;
+  margin: 40px auto 20px auto;
+}
+
