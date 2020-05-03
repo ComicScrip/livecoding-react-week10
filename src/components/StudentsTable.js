@@ -4,13 +4,18 @@ import { sortBy } from 'lodash';
 
 const LinkTd = ({ to, children }) => <td><Link to={to}>{children}</Link></td>;
 
-const StudentsTableRow = ({ firstName, lastName, p1bisPresented, githubUserName }) => {
+const StudentsTableRow = ({ firstName, lastName, p1bisPresented, githubUserName, handleDelete, deleting }) => {
   const studentDetailsPageLink = '/students/' + githubUserName;
   return (
-    <tr key={githubUserName}>
+    <tr>
       <LinkTd to={studentDetailsPageLink}>{firstName}</LinkTd>
       <LinkTd to={studentDetailsPageLink}>{lastName.toUpperCase()}</LinkTd>
       <td>{p1bisPresented ? 'Oui' : 'Pas encore'}</td>
+      <td style={{width: 200}}>
+        <button disabled={deleting} className="student-row-del-btn" onClick={handleDelete}>
+          {deleting ? 'Suppression en cours' : 'Supprimer'}
+        </button>
+      </td>
     </tr>
   );
 };
@@ -27,12 +32,12 @@ const SortButton = ({ fieldToSortBy, sortOrder, activeSort, onClick }) => {
   );
 };
 
-function StudentsTable ({students}) {
+function StudentsTable ({ students, destroyStudent, deletingSingleStudent }) {
   const [activeSort, setActiveSort] = useState('');
   const sortStudents = fieldToSortByWithOrder => {
     setActiveSort(activeSort === fieldToSortByWithOrder ? '' : fieldToSortByWithOrder);
   };
-  const handleSortButtonClicked = fieldToSortByWithOrder => sortStudents(fieldToSortByWithOrder)
+  const handleSortButtonClicked = fieldToSortByWithOrder => sortStudents(fieldToSortByWithOrder);
   const [fieldToSortBy, sortOrder] = activeSort.split(' ');
 
   let sortedStudents = students;
@@ -60,13 +65,22 @@ function StudentsTable ({students}) {
             </span>
           </td>
           <td>P1bis présenté</td>
+          <td>Actions</td>
         </tr>
       </thead>
       <tbody>
-        {sortedStudents.map(StudentsTableRow)}
+        {sortedStudents.map(s => <StudentsTableRow
+          key={s.githubUserName}
+          firstName={s.firstName}
+          lastName={s.lastName}
+          githubUserName={s.githubUserName}
+          p1bisPresented={s.p1bisPresented}
+          handleDelete={() => { destroyStudent(s.githubUserName); }}
+          deleting={s.githubUserName === deletingSingleStudent}
+        />)}
       </tbody>
     </table>
   );
 }
 
-export default React.memo(StudentsTable, (prev, next) => prev.students === next.students);
+export default React.memo(StudentsTable, (prev, next) => prev.students === next.students && prev.deletingSingleStudent === next.deletingSingleStudent);

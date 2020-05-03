@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const _ = require('lodash');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
 
@@ -58,7 +58,7 @@ let studentsRawData = [
   {
     firstName: 'Geoffroy',
     lastName: 'Crabières',
-    githubAccountUrl: 'http://github.com/Gottfrieden',
+    githubAccountUrl: 'https://github.com/Gottfrieden',
     p1bisRepoUrl: 'https://github.com/Gottfrieden/lyon-0320-golden-retro',
     p1bisPresented: true
   },
@@ -142,7 +142,7 @@ let studentsRawData = [
 ];
 
 app.use(cors());
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 app.get('/students', (req, res) => {
   setTimeout(() => {
@@ -154,7 +154,7 @@ app.get('/students', (req, res) => {
 app.get('/students/:githubAccountName', (req, res) => {
   setTimeout(() => {
     const githubAccountUrl = 'https://github.com/' + req.params.githubAccountName;
-    const existingStudent = _.find(studentsRawData, {githubAccountUrl});
+    const existingStudent = _.find(studentsRawData, { githubAccountUrl });
     if (existingStudent) {
       res.json(existingStudent);
     } else {
@@ -166,10 +166,10 @@ app.get('/students/:githubAccountName', (req, res) => {
 app.delete('/students/:githubAccountName', (req, res) => {
   setTimeout(() => {
     const githubAccountUrl = 'https://github.com/' + req.params.githubAccountName;
-    const existingStudent = _.find(studentsRawData, {githubAccountUrl});
+    const existingStudent = _.find(studentsRawData, { githubAccountUrl });
 
     if (existingStudent) {
-      studentsRawData = studentsRawData.filter(s => s.githubAccountUrl !== githubAccountUrl)
+      studentsRawData = studentsRawData.filter(s => s.githubAccountUrl !== githubAccountUrl);
       res.sendStatus(200);
     } else {
       res.sendStatus(404);
@@ -180,18 +180,16 @@ app.delete('/students/:githubAccountName', (req, res) => {
 app.post('/students', (req, res) => {
   setTimeout(() => {
     const newStudentAttributes = req.body;
-    const existingStudent = _.find(studentsRawData, {githubAccountUrl: newStudentAttributes.githubAccountUrl})
+    const existingStudent = _.find(studentsRawData, { githubAccountUrl: newStudentAttributes.githubAccountUrl });
 
     if (existingStudent) {
       res.status(400);
-      return res.json({error: `Un étudiant avec l\'URL Github "${newStudentAttributes.githubAccountUrl}" existe déjà sur le serveur !`})
+      return res.json({ error: `Un étudiant avec l\'URL Github "${newStudentAttributes.githubAccountUrl}" existe déjà sur le serveur !` });
     }
 
-    studentsRawData.push({...newStudentAttributes, p1bisPresented: false, p1bisRepoUrl: newStudentAttributes.githubAccountUrl});
+    studentsRawData.push({ ...newStudentAttributes, p1bisPresented: false, p1bisRepoUrl: newStudentAttributes.githubAccountUrl });
     res.json(newStudentAttributes);
   }, 2000);
 });
-
-
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));

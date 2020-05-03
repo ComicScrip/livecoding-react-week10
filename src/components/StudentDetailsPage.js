@@ -1,12 +1,12 @@
-import React, {useEffect} from 'react'
+import React, { useEffect } from 'react';
 import { withStudents } from '../data/students';
 import LoadingIndicator from './LoadingIndicator';
 import ErrorBox from './ErrorBox';
 
 function StudentDetailsPage ({ match: { params: { githubAccountName } }, fetchSingleStudent, singleStudent, fetchSingleStudentError, loadingSingleStudent }) {
   useEffect(() => {
-    fetchSingleStudent(githubAccountName)
-  }, [])
+    fetchSingleStudent(githubAccountName);
+  }, []);
 
   if (loadingSingleStudent) return <LoadingIndicator />;
   if (fetchSingleStudentError) return <ErrorBox message={fetchSingleStudentError} />;

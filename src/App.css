@@ -195,6 +195,10 @@ td a {
   opacity: 1;
 }
 
+.student-form {
+  margin-top: 50px;
+}
+
 .student-form .field {
   margin-bottom: 10px;
 }
@@ -211,5 +215,13 @@ td a {
   color: white;
   cursor: pointer;
   margin: 40px auto 20px auto;
+}
+
+.student-row-del-btn {
+  cursor: pointer;
+}
+
+.student-row-del-btn[disabled] {
+  cursor: not-allowed;
 }
 

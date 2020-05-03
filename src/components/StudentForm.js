@@ -1,15 +1,15 @@
-import React, {useState} from 'react'
-import ErrorBox from './ErrorBox'
+import React, { useState } from 'react';
+import ErrorBox from './ErrorBox';
 
-const Field = ({label, inputProps}) =>
-  <div className="field">
+const Field = ({ label, inputProps }) =>
+  <div className='field'>
     <label htmlFor={inputProps.name}>{label} : </label>
     <input {...inputProps} id={inputProps.name} />
-  </div>
+  </div>;
 
-const StudentForm = ({onSubmit, submittingStudent, submitStudentError}) => {
+const StudentForm = ({ onSubmit, submittingStudent, submitStudentError }) => {
   const handleFieldChange = (fieldName, value) => setFields(prevFields => prevFields.map(f =>
-    f.input.name === fieldName ? {...f, input: {...f.input, value}} : f
+    f.input.name === fieldName ? { ...f, input: { ...f.input, value } } : f
   ));
   const createFieldChangeHandler = fieldName => event => handleFieldChange(fieldName, event.target.value);
 
@@ -21,7 +21,7 @@ const StudentForm = ({onSubmit, submittingStudent, submitStudentError}) => {
         value: '',
         onChange: createFieldChangeHandler('firstName'),
         type: 'text',
-        required: true,
+        required: true
       }
     },
     {
@@ -31,7 +31,7 @@ const StudentForm = ({onSubmit, submittingStudent, submitStudentError}) => {
         value: '',
         onChange: createFieldChangeHandler('lastName'),
         type: 'text',
-        required: true,
+        required: true
       }
     },
     {
@@ -41,26 +41,26 @@ const StudentForm = ({onSubmit, submittingStudent, submitStudentError}) => {
         value: '',
         onChange: createFieldChangeHandler('githubAccountUrl'),
         type: 'url',
-        required: true,
+        required: true
       }
     }
-  ])
+  ]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const formValues = {};
-    fields.forEach(f => { formValues[f.input.name] = f.input.value; })
+    fields.forEach(f => { formValues[f.input.name] = f.input.value; });
     onSubmit(formValues);
-  }
+  };
 
   return (
-    <form className="student-form" onSubmit={handleSubmit} aria-disabled={submittingStudent}>
+    <form className='student-form' onSubmit={handleSubmit} aria-disabled={submittingStudent}>
       <h2>Ajouter un étudiant</h2>
       {fields.map(f => <Field label={f.label} inputProps={f.input} key={f.input.name} />)}
-      <input type="submit" disabled={submittingStudent} value={submittingStudent ? "Ajout en cours..." : "Ajouter"} />
+      <input type='submit' disabled={submittingStudent} value={submittingStudent ? 'Ajout en cours...' : 'Ajouter'} />
       {submitStudentError && <ErrorBox message={submitStudentError} />}
     </form>
-  )
-}
+  );
+};
 
-export default StudentForm
+export default StudentForm;

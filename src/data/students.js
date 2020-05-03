@@ -9,15 +9,19 @@ class Student {
   }
 
   static async loadAll () {
-    return axios.get('http://localhost:3000/students').then(res => res.data)
+    return axios.get('http://localhost:3000/students').then(res => res.data);
   }
 
   static async loadOne (githubAccountName) {
-    return axios.get(`http://localhost:3000/students/${githubAccountName}`).then(res => res.data)
+    return axios.get(`http://localhost:3000/students/${githubAccountName}`).then(res => res.data);
   }
 
-  static async create(attributes) {
-    return axios.post('http://localhost:3000/students', attributes).then(res => res.data)
+  static async destroy (githubAccountName) {
+    return axios.delete(`http://localhost:3000/students/${githubAccountName}`);
+  }
+
+  static async create (attributes) {
+    return axios.post('http://localhost:3000/students', attributes).then(res => res.data);
   }
 
   get githubUserName () {
@@ -39,11 +43,13 @@ export const withStudents = WrappedComponent => {
     const [loadingStudents, setLoadingStudents] = useState(false);
     const [loadingSingleStudent, setLoadingSingleStudent] = useState(false);
     const [submittingStudent, setSubmittingStudent] = useState(false);
+    const [deletingSingleStudent, setDeletingSingleStudent] = useState('');
     const [studentList, setStudentList] = useState([]);
     const [singleStudent, setSingleStudent] = useState(null);
     const [fetchStudentsError, setFetchStudentsError] = useState(null);
     const [submitStudentError, setSubmitStudentError] = useState(null);
     const [fetchSingleStudentError, setFetchSingleStudentError] = useState(null);
+    const [deleteSingleStudentError, setDeleteSingleStudentError] = useState(null);
 
     const fetchStudentList = () => {
       setLoadingStudents(true);
@@ -65,14 +71,27 @@ export const withStudents = WrappedComponent => {
         .then(student => {
           setSingleStudent(new Student(student));
           setFetchSingleStudentError(null);
-        }).catch(({response}) => {
-        console.error(response);
-        if (response && response.status === 404) {
-          setFetchSingleStudentError(`Aucun élève avec l'identifiant "${githubAccountName}" n'a été trouvé sur le serveur`);
-        } else {
-          setFetchSingleStudentError('Une erreur est survenue lors du chargement de cet élève');
-        }
-      }).finally(() => setLoadingSingleStudent(false));
+        }).catch(({ response }) => {
+          console.error(response);
+          if (response && response.status === 404) {
+            setFetchSingleStudentError(`Aucun élève avec l'identifiant "${githubAccountName}" n'a été trouvé sur le serveur`);
+          } else {
+            setFetchSingleStudentError('Une erreur est survenue lors du chargement de cet élève');
+          }
+        }).finally(() => setLoadingSingleStudent(false));
+    };
+
+    const deleteSingleStudent = (githubAccountName) => {
+      setDeletingSingleStudent(githubAccountName);
+      setDeleteSingleStudentError(null);
+      return Student.destroy(githubAccountName)
+        .then(() => {
+          setStudentList(prevStudentList => prevStudentList.filter(s => s.githubUserName !== githubAccountName));
+          setDeleteSingleStudentError(null);
+        }).catch(({ response }) => {
+          console.error(response);
+          throw new Error(response)
+        }).finally(() => setDeletingSingleStudent(''));
     };
 
     const createStudent = (attributes) => {
@@ -81,32 +100,37 @@ export const withStudents = WrappedComponent => {
       return Student.create(attributes).then(student => {
         setStudentList([...studentList, student].map(s => new Student(s)));
         setSubmitStudentError(null);
-      }).catch(({response}) => {
-        console.error(response)
+      }).catch(({ response }) => {
+        console.error(response);
         if (response.data && response.data.error) {
-          setSubmitStudentError("Erreur : " + response.data.error)
+          setSubmitStudentError('Erreur : ' + response.data.error);
         } else {
-          setSubmitStudentError("Un problème est survenu lors de la création de l'étudiant sur le serveur")
+          setSubmitStudentError("Un problème est survenu lors de la création de l'étudiant sur le serveur");
         }
-      }).finally(() => setSubmittingStudent(false))
-    }
+      }).finally(() => setSubmittingStudent(false));
+    };
 
     return (
-      <WrappedComponent {...{...{
+      <WrappedComponent {...{
+        ...{
           loadingStudents,
           studentList,
           fetchStudentsError,
           loadingSingleStudent,
           singleStudent,
           fetchSingleStudentError,
+          deletingSingleStudent,
+          deleteSingleStudentError,
           submittingStudent,
           submitStudentError,
           fetchStudentList,
           fetchSingleStudent,
-          createStudent
+          createStudent,
+          deleteSingleStudent
         },
         ...props
-      }} />
+      }}
+      />
     );
   };
 };
