@@ -1,3 +1,11 @@
+# Server
+Before using the app, you need to setup and start the server :
+```shell script
+cd server && npm i && npm start
+```
+
+# Client
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
