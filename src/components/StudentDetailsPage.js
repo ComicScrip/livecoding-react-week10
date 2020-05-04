@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { withStudents } from '../data/students';
+import { useStudents } from '../data/students'
 import LoadingIndicator from './LoadingIndicator';
 import ErrorBox from './ErrorBox';
 
-function StudentDetailsPage ({ match: { params: { githubAccountName } }, fetchSingleStudent, singleStudent, fetchSingleStudentError, loadingSingleStudent }) {
+function StudentDetailsPage ({ match: { params: { githubAccountName } }}) {
+  const { fetchSingleStudent, singleStudent, fetchSingleStudentError, loadingSingleStudent } = useStudents();
   useEffect(() => {
     fetchSingleStudent(githubAccountName);
   }, []);
@@ -30,4 +31,4 @@ function StudentDetailsPage ({ match: { params: { githubAccountName } }, fetchSi
   );
 }
 
-export default withStudents(StudentDetailsPage);
+export default StudentDetailsPage;

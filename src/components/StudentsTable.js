@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react'
 import { Link } from 'react-router-dom';
 import { sortBy } from 'lodash';
 
@@ -34,19 +34,23 @@ const SortButton = ({ fieldToSortBy, sortOrder, activeSort, onClick }) => {
 
 function StudentsTable ({ students, destroyStudent, deletingSingleStudent }) {
   const [activeSort, setActiveSort] = useState('');
+  const [sortedStudents, setSortedStudents] = useState(students)
   const sortStudents = fieldToSortByWithOrder => {
     setActiveSort(activeSort === fieldToSortByWithOrder ? '' : fieldToSortByWithOrder);
   };
   const handleSortButtonClicked = fieldToSortByWithOrder => sortStudents(fieldToSortByWithOrder);
-  const [fieldToSortBy, sortOrder] = activeSort.split(' ');
+  useEffect(() => {
+    let sorted = students.slice();
+    const [fieldToSortBy, sortOrder] = activeSort.split(' ');
 
-  let sortedStudents = students;
-  if (fieldToSortBy) {
-    sortedStudents = sortBy(students, fieldToSortBy);
-    if (sortOrder === 'DESC') {
-      sortedStudents = sortedStudents.reverse();
+    if (fieldToSortBy) {
+      sorted = sortBy(students, fieldToSortBy);
+      if (sortOrder === 'DESC') {
+        sorted = sorted.reverse();
+      }
     }
-  }
+    setSortedStudents(sorted)
+  }, [students, activeSort])
 
   return (
     <table>
@@ -83,4 +87,4 @@ function StudentsTable ({ students, destroyStudent, deletingSingleStudent }) {
   );
 }
 
-export default React.memo(StudentsTable, (prev, next) => prev.students === next.students && prev.deletingSingleStudent === next.deletingSingleStudent);
+export default StudentsTable;

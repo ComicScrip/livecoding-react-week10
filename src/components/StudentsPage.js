@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import StudentsTable from './StudentsTable';
-import { withStudents } from '../data/students';
+import {useStudents, withStudents} from '../data/students'
 import LoadingIndicator from './LoadingIndicator';
 import ErrorBox from './ErrorBox';
 import StudentForm from './StudentForm'
@@ -11,7 +11,19 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-function StudentsPage ({ loadingStudents, studentList, fetchStudentsError, fetchStudentList, createStudent, deletingSingleStudent, deleteSingleStudent, submittingStudent, submitStudentError }) {
+function StudentsPage () {
+  const {
+    loadingStudents,
+    studentList,
+    fetchStudentsError,
+    fetchStudentList,
+    createStudent,
+    deletingSingleStudent,
+    deleteSingleStudent,
+    submittingStudent,
+    submitStudentError
+  } = useStudents();
+
   useEffect(fetchStudentList, []);
 
   const [alertOpen, setAlertOpen] = useState(false);
@@ -72,4 +84,4 @@ function StudentsPage ({ loadingStudents, studentList, fetchStudentsError, fetch
   );
 }
 
-export default withStudents(StudentsPage);
+export default StudentsPage;
