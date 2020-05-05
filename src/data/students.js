@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 
 class Student {
@@ -42,7 +42,6 @@ export const useStudents = () => {
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [loadingSingleStudent, setLoadingSingleStudent] = useState(false);
   const [submittingStudent, setSubmittingStudent] = useState(false);
-  const [deletingSingleStudent, setDeletingSingleStudent] = useState('');
   const [studentList, setStudentList] = useState([]);
   const [singleStudent, setSingleStudent] = useState(null);
   const [fetchStudentsError, setFetchStudentsError] = useState(null);
@@ -58,9 +57,9 @@ export const useStudents = () => {
         setStudentList(studentList.map(s => new Student(s)));
         setFetchStudentsError(null);
       }).catch(error => {
-      console.error(error);
-      setFetchStudentsError('Une erreur est survenue lors du chargement de la liste des élèves');
-    }).finally(() => setLoadingStudents(false));
+        console.error(error);
+        setFetchStudentsError('Une erreur est survenue lors du chargement de la liste des élèves');
+      }).finally(() => setLoadingStudents(false));
   };
 
   const fetchSingleStudent = (githubAccountName) => {
@@ -71,17 +70,21 @@ export const useStudents = () => {
         setSingleStudent(new Student(student));
         setFetchSingleStudentError(null);
       }).catch(({ response }) => {
-      console.error(response);
-      if (response && response.status === 404) {
-        setFetchSingleStudentError(`Aucun élève avec l'identifiant "${githubAccountName}" n'a été trouvé sur le serveur`);
-      } else {
-        setFetchSingleStudentError('Une erreur est survenue lors du chargement de cet élève');
-      }
-    }).finally(() => setLoadingSingleStudent(false));
+        console.error(response);
+        if (response && response.status === 404) {
+          setFetchSingleStudentError(`Aucun élève avec l'identifiant "${githubAccountName}" n'a été trouvé sur le serveur`);
+        } else {
+          setFetchSingleStudentError('Une erreur est survenue lors du chargement de cet élève');
+        }
+      }).finally(() => setLoadingSingleStudent(false));
   };
 
+  const setDeletingSingleStudent = (githubAccountName, deleting) => setStudentList(prevList => prevList.map(s =>
+    s.githubUserName === githubAccountName ? new Student({ ...s, _deleting: deleting }) : s
+  ));
+
   const deleteSingleStudent = (githubAccountName) => {
-    setDeletingSingleStudent(githubAccountName);
+    setDeletingSingleStudent(githubAccountName, true);
     setDeleteSingleStudentError(null);
     return Student.destroy(githubAccountName)
       .then(() => {
@@ -89,8 +92,8 @@ export const useStudents = () => {
         setDeleteSingleStudentError(null);
       }).catch(({ response }) => {
         console.error(response);
-        throw new Error(response)
-      }).finally(() => setDeletingSingleStudent(''));
+        throw new Error(response);
+      }).finally(() => setDeletingSingleStudent(githubAccountName, false));
   };
 
   const createStudent = (attributes) => {
@@ -116,7 +119,6 @@ export const useStudents = () => {
     loadingSingleStudent,
     singleStudent,
     fetchSingleStudentError,
-    deletingSingleStudent,
     deleteSingleStudentError,
     submittingStudent,
     submitStudentError,
@@ -125,6 +127,6 @@ export const useStudents = () => {
     createStudent,
     deleteSingleStudent
   };
-}
+};
 
 export default Student;

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { sortBy } from 'lodash';
 
@@ -11,8 +11,8 @@ const StudentsTableRow = ({ firstName, lastName, p1bisPresented, githubUserName,
       <LinkTd to={studentDetailsPageLink}>{firstName}</LinkTd>
       <LinkTd to={studentDetailsPageLink}>{lastName.toUpperCase()}</LinkTd>
       <td>{p1bisPresented ? 'Oui' : 'Pas encore'}</td>
-      <td style={{width: 200}}>
-        <button disabled={deleting} className="student-row-del-btn" onClick={handleDelete}>
+      <td style={{ width: 200 }}>
+        <button disabled={deleting} className='student-row-del-btn' onClick={handleDelete}>
           {deleting ? 'Suppression en cours' : 'Supprimer'}
         </button>
       </td>
@@ -34,7 +34,7 @@ const SortButton = ({ fieldToSortBy, sortOrder, activeSort, onClick }) => {
 
 function StudentsTable ({ students, destroyStudent, deletingSingleStudent }) {
   const [activeSort, setActiveSort] = useState('');
-  const [sortedStudents, setSortedStudents] = useState(students)
+  const [sortedStudents, setSortedStudents] = useState(students);
   const sortStudents = fieldToSortByWithOrder => {
     setActiveSort(activeSort === fieldToSortByWithOrder ? '' : fieldToSortByWithOrder);
   };
@@ -49,8 +49,8 @@ function StudentsTable ({ students, destroyStudent, deletingSingleStudent }) {
         sorted = sorted.reverse();
       }
     }
-    setSortedStudents(sorted)
-  }, [students, activeSort])
+    setSortedStudents(sorted);
+  }, [students, activeSort]);
 
   return (
     <table>
@@ -73,15 +73,17 @@ function StudentsTable ({ students, destroyStudent, deletingSingleStudent }) {
         </tr>
       </thead>
       <tbody>
-        {sortedStudents.map(s => <StudentsTableRow
-          key={s.githubUserName}
-          firstName={s.firstName}
-          lastName={s.lastName}
-          githubUserName={s.githubUserName}
-          p1bisPresented={s.p1bisPresented}
-          handleDelete={() => { destroyStudent(s.githubUserName); }}
-          deleting={s.githubUserName === deletingSingleStudent}
-        />)}
+        {sortedStudents.map(s =>
+          <StudentsTableRow
+            key={s.githubUserName}
+            firstName={s.firstName}
+            lastName={s.lastName}
+            githubUserName={s.githubUserName}
+            p1bisPresented={s.p1bisPresented}
+            handleDelete={() => { destroyStudent(s.githubUserName); }}
+            deleting={s._deleting}
+          />
+        )}
       </tbody>
     </table>
   );

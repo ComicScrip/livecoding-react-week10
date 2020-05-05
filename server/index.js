@@ -184,7 +184,7 @@ app.post('/students', (req, res) => {
 
     if (existingStudent) {
       res.status(400);
-      return res.json({ error: `Un étudiant avec l\'URL Github "${newStudentAttributes.githubAccountUrl}" existe déjà sur le serveur !` });
+      return res.json({ error: `Un étudiant avec l'URL Github "${newStudentAttributes.githubAccountUrl}" existe déjà sur le serveur !` });
     }
 
     studentsRawData.push({ ...newStudentAttributes, p1bisPresented: false, p1bisRepoUrl: newStudentAttributes.githubAccountUrl });
